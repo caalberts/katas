@@ -30,8 +30,12 @@ RSpec.describe WordWrap do
       expect(described_class.wrap('foo bar baz', 8)).to eq("foo bar\nbaz")
     end
 
-    xit 'returns a wrapped text when there are multiple words' do
-      expect(described_class.wrap('foo boo bar baz', 8)).to eq("foo bar\nbar baz")
+    it 'returns a wrapped text when there are multiple words' do
+      expect(described_class.wrap('foo boo bar baz', 8)).to eq("foo boo\nbar baz")
+    end
+
+    it 'returns a wrapped text when first line has longer word' do
+      expect(described_class.wrap('fooboobar baz duh', 9)).to eq("fooboobar\nbaz duh")
     end
   end
 end

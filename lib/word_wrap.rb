@@ -15,13 +15,16 @@ class WordWrap
 
     result = words.each_with_object(StringIO.new) do |word, result|
       if new_length(current_length, word.length) <= column
-        result.write(separator)
         result.write(word)
+        result.write(separator)
 
-        current_length += separator.length + word.length
+        current_length += word.length + separator.length
       else
+        result.ungetc(separator)
+
         result.write("\n")
         result.write(word)
+        result.write(separator)
 
         current_length = word.length
       end
