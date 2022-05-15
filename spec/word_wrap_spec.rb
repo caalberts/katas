@@ -13,5 +13,13 @@ RSpec.describe WordWrap do
       expect(described_class.wrap('ab', 1)).to eq("a\nb")
       expect(described_class.wrap('abc', 1)).to eq("a\nb\nc")
     end
+
+    it 'returns a single word when the word is exactly the column length' do
+      expect(described_class.wrap('foo', 3)).to eq('foo')
+    end
+
+    it 'returns a single word when the word is shorter than column' do
+      expect(described_class.wrap('foo', 4)).to eq('foo')
+    end
   end
 end
