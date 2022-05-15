@@ -35,10 +35,32 @@ end
 class Collector
   SPACE = ' '
 
+  class Line
+    def initialize(column)
+      @column = column
+      @buffer = StringIO.new
+    end
+
+    def append(word)
+      if @buffer.size > 0
+        @buffer.write(SPACE)
+      end
+
+      @buffer.write(word)
+    end
+
+    def has_space?(word)
+      @buffer.size + word.length <= @column
+    end
+
+    def to_s
+      @buffer.string
+    end
+  end
+
   def initialize(column)
-    @buffer = StringIO.new
     @column = column
-    @current_line_length = 0
+    @lines = []
   end
 
   def add_word(word)
@@ -50,20 +72,21 @@ class Collector
   end
 
   def result
-    @buffer.string.strip
+    @lines.map(&:to_s).join("\n")
   end
 
   private
 
+  def current_line
+    @lines.last
+  end
+
   def current_line_has_space?(word)
-    @current_line_length + word.length <= @column
+    current_line&.has_space?(word)
   end
 
   def add_to_current_line(word)
-    @buffer.write(word)
-    @buffer.write(SPACE)
-
-    @current_line_length += word.length + 1
+    current_line.append(word)
   end
 
   def add_on_new_line(word)
@@ -72,14 +95,7 @@ class Collector
     end
 
     new_line
-    add_word(word)
-  end
-
-  def new_line
-    @buffer.ungetc(SPACE)
-    @buffer.write("\n")
-
-    @current_line_length = 0
+    add_to_current_line(word)
   end
 
   def add_word_segments(word)
@@ -91,5 +107,10 @@ class Collector
 
   def too_long_for_column?(word)
     word.length > @column
+  end
+
+  def new_line
+    @lines ||= []
+    @lines << Line.new(@column)
   end
 end
