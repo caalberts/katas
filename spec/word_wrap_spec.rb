@@ -25,5 +25,9 @@ RSpec.describe WordWrap do
     it 'returns a wrapped text when there are 2 words' do
       expect(described_class.wrap('foo bar', 3)).to eq("foo\nbar")
     end
+
+    it 'returns a wrapped text when there are 3 words' do
+      expect(described_class.wrap('foo bar baz', 8)).to eq("foo bar\nbaz")
+    end
   end
 end
