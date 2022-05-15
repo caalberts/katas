@@ -6,6 +6,10 @@ class WordWrap
       return string
     end
 
+    if string.include?(' ')
+      return string.split(" ").join("\n")
+    end
+
     string.split("").join("\n")
   end
 end

@@ -21,5 +21,9 @@ RSpec.describe WordWrap do
     it 'returns a single word when the word is shorter than column' do
       expect(described_class.wrap('foo', 4)).to eq('foo')
     end
+
+    it 'returns a wrapped text when there are 2 words' do
+      expect(described_class.wrap('foo bar', 3)).to eq("foo\nbar")
+    end
   end
 end
