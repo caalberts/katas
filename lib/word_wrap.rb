@@ -1,28 +1,27 @@
 class WordWrap
+  SPACE = ' '
+  BLANK = ''
+
   def self.wrap(string, column)
     raise ArgumentError if column < 1
 
-    if string.length <= column
-      return string
-    end
+    return string if string.length <= column
 
-    if string.include?(' ')
-      words = string.split(' ')
+    separator = string.include?(SPACE) ? SPACE : BLANK
 
-      result = words.each_with_object(StringIO.new) do |word, result|
-        if new_length(result.length, word.length) <= column
-          result.write(' ')
-          result.write(word)
-        else
-          result.write("\n")
-          result.write(word)
-        end
+    words = string.split(separator)
+
+    result = words.each_with_object(StringIO.new) do |word, result|
+      if new_length(result.length, word.length) <= column
+        result.write(separator)
+        result.write(word)
+      else
+        result.write("\n")
+        result.write(word)
       end
-
-      return result.string.strip
     end
 
-    string.split("").join("\n")
+    result.string.strip
   end
 
   def self.new_length(current_length, word_length)
