@@ -5,35 +5,91 @@ class WordWrap
   def self.wrap(string, column)
     raise ArgumentError if column < 1
 
-    return string if string.length <= column
+    parser = Parser.new(string)
+    collector = Collector.new(column)
 
-    separator = string.include?(SPACE) ? SPACE : BLANK
-
-    words = string.split(separator)
-
-    current_length = 0
-
-    result = words.each_with_object(StringIO.new) do |word, result|
-      if new_length(current_length, word.length) <= column
-        result.write(word)
-        result.write(separator)
-
-        current_length += word.length + separator.length
-      else
-        result.ungetc(separator)
-
-        result.write("\n")
-        result.write(word)
-        result.write(separator)
-
-        current_length = word.length
-      end
+    parser.each_word do |word|
+      collector.add_word(word)
     end
 
-    result.string.strip
+    collector.result
+  end
+end
+
+class Parser
+  WORD_PATTERN = %r{([A-z]+)[ \n]?}
+
+  def initialize(string)
+    @scanner = StringScanner.new(string)
   end
 
-  def self.new_length(current_length, word_length)
-    current_length + word_length
+  def each_word
+    until @scanner.eos?
+      @scanner.scan(WORD_PATTERN)
+
+      yield @scanner.captures&.first
+    end
+  end
+end
+
+class Collector
+  SPACE = ' '
+
+  def initialize(column)
+    @buffer = StringIO.new
+    @column = column
+    @current_line_length = 0
+  end
+
+  def add_word(word)
+    if current_line_has_space?(word)
+      add_to_current_line(word)
+    else
+      add_on_new_line(word)
+    end
+  end
+
+  def result
+    @buffer.string.strip
+  end
+
+  private
+
+  def current_line_has_space?(word)
+    @current_line_length + word.length <= @column
+  end
+
+  def add_to_current_line(word)
+    @buffer.write(word)
+    @buffer.write(SPACE)
+
+    @current_line_length += word.length + 1
+  end
+
+  def add_on_new_line(word)
+    if too_long_for_column?(word)
+      return add_word_segments(word)
+    end
+
+    new_line
+    add_word(word)
+  end
+
+  def new_line
+    @buffer.ungetc(SPACE)
+    @buffer.write("\n")
+
+    @current_line_length = 0
+  end
+
+  def add_word_segments(word)
+    until word.empty?
+      segment = word.slice!(0...@column)
+      add_on_new_line(segment)
+    end
+  end
+
+  def too_long_for_column?(word)
+    word.length > @column
   end
 end

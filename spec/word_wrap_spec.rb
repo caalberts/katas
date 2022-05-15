@@ -37,5 +37,25 @@ RSpec.describe WordWrap do
     it 'returns a wrapped text when first line has longer word' do
       expect(described_class.wrap('fooboobar baz duh', 9)).to eq("fooboobar\nbaz duh")
     end
+
+    it 'returns a wrapped text when next line has longer word' do
+      expect(described_class.wrap('foo boo barbazduh', 9)).to eq("foo boo\nbarbazduh")
+    end
+
+    it 'returns a wrapped text when there are different length words' do
+      expect(described_class.wrap('foo barbazduh bart f', 6)).to eq("foo\nbarbaz\nduh\nbart f")
+    end
+  end
+end
+
+RSpec.describe Parser do
+  subject { described_class.new(string) }
+
+  describe '#each_word' do
+    let(:string) { 'foo bar baz' }
+
+    it 'yields each word in the string' do
+      expect { |b| subject.each_word(&b) }.to yield_successive_args('foo', 'bar', 'baz')
+    end
   end
 end
