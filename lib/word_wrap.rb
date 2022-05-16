@@ -5,7 +5,7 @@ class WordWrap
   def self.wrap(string, column)
     raise ArgumentError if column < 1
 
-    parser = Parser.new(string)
+    parser = Parser.new(string, column)
     collector = Collector.new(column)
 
     parser.each_word do |word|
@@ -19,15 +19,30 @@ end
 class Parser
   WORD_PATTERN = %r{([A-z]+)[ \n]?}
 
-  def initialize(string)
+  def initialize(string, max_length)
     @scanner = StringScanner.new(string)
+    @max_length = max_length
   end
 
   def each_word
     until @scanner.eos?
       @scanner.scan(WORD_PATTERN)
 
-      yield @scanner.captures&.first
+      word = @scanner.captures&.first
+
+      if word.length <= @max_length
+        yield word
+      else
+        segments(word) do |segment|
+          yield segment
+        end
+      end
+    end
+  end
+
+  def segments(word)
+    until word.empty?
+      yield word.slice!(0...@max_length)
     end
   end
 end
@@ -64,9 +79,7 @@ class Collector
   end
 
   def add_word(word)
-    if too_long_for_column?(word)
-      add_word_segments(word)
-    elsif current_line_has_space?(word)
+    if current_line_has_space?(word)
       add_to_current_line(word)
     else
       add_on_new_line(word)
@@ -94,17 +107,6 @@ class Collector
   def add_on_new_line(word)
     new_line
     add_to_current_line(word)
-  end
-
-  def add_word_segments(word)
-    until word.empty?
-      segment = word.slice!(0...@column)
-      add_on_new_line(segment)
-    end
-  end
-
-  def too_long_for_column?(word)
-    word.length > @column
   end
 
   def new_line

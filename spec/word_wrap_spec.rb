@@ -49,13 +49,22 @@ RSpec.describe WordWrap do
 end
 
 RSpec.describe Parser do
-  subject { described_class.new(string) }
+  subject { described_class.new(string, max_length) }
 
   describe '#each_word' do
     let(:string) { 'foo bar baz' }
+    let(:max_length) { 4 }
 
     it 'yields each word in the string' do
       expect { |b| subject.each_word(&b) }.to yield_successive_args('foo', 'bar', 'baz')
+    end
+
+    context 'when a word is longer than max length' do
+      let(:string) { 'foo barbaz dot'}
+
+      it 'splits long word at max length' do
+        expect { |b| subject.each_word(&b) }.to yield_successive_args('foo', 'barb', 'az', 'dot')
+      end
     end
   end
 end
