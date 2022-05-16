@@ -64,7 +64,9 @@ class Collector
   end
 
   def add_word(word)
-    if current_line_has_space?(word)
+    if too_long_for_column?(word)
+      add_word_segments(word)
+    elsif current_line_has_space?(word)
       add_to_current_line(word)
     else
       add_on_new_line(word)
@@ -90,10 +92,6 @@ class Collector
   end
 
   def add_on_new_line(word)
-    if too_long_for_column?(word)
-      return add_word_segments(word)
-    end
-
     new_line
     add_to_current_line(word)
   end
