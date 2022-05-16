@@ -25,22 +25,20 @@ class Parser
   end
 
   def each_word
-    until @scanner.eos?
-      @scanner.scan(WORD_PATTERN)
-
+    until @scanner.eos? || !@scanner.scan(WORD_PATTERN)
       word = @scanner.captures&.first
 
-      if word.length <= @max_length
-        yield word
-      else
-        segments(word) do |segment|
-          yield segment
-        end
+      segmentize(word) do |segment|
+        yield segment
       end
     end
   end
 
-  def segments(word)
+  private
+
+  def segmentize(word)
+    return yield word if word.length <= @max_length
+
     until word.empty?
       yield word.slice!(0...@max_length)
     end
