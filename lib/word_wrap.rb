@@ -79,11 +79,7 @@ class Collector
   end
 
   def add_word(word)
-    if current_line_has_space?(word)
-      add_to_current_line(word)
-    else
-      add_on_new_line(word)
-    end
+    line_for(word).append(word)
   end
 
   def result
@@ -92,25 +88,21 @@ class Collector
 
   private
 
+  def line_for(word)
+    if current_line&.has_space?(word)
+      current_line
+    else
+      new_line
+    end
+  end
+
   def current_line
     @lines.last
   end
 
-  def current_line_has_space?(word)
-    current_line&.has_space?(word)
-  end
-
-  def add_to_current_line(word)
-    current_line.append(word)
-  end
-
-  def add_on_new_line(word)
-    new_line
-    add_to_current_line(word)
-  end
-
   def new_line
-    @lines ||= []
-    @lines << Line.new(@column)
+    Line.new(@column).tap do|line|
+      @lines << line
+    end
   end
 end
