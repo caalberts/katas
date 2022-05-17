@@ -46,31 +46,6 @@ class Parser
 end
 
 class Collector
-  SPACE = ' '
-
-  class Line
-    def initialize(column)
-      @column = column
-      @buffer = StringIO.new
-    end
-
-    def append(word)
-      if @buffer.size > 0
-        @buffer.write(SPACE)
-      end
-
-      @buffer.write(word)
-    end
-
-    def has_space?(word)
-      @buffer.size + word.length <= @column
-    end
-
-    def to_s
-      @buffer.string
-    end
-  end
-
   def initialize(column)
     @column = column
     @lines = []
@@ -102,5 +77,32 @@ class Collector
     Line.new(@column).tap do|line|
       @lines << line
     end
+  end
+end
+
+class Line
+  SPACE = ' '
+
+  def initialize(column)
+    @column = column
+    @buffer = StringIO.new
+  end
+
+  def append(word)
+    if @buffer.size > 0
+      @buffer.write(SPACE)
+    end
+
+    @buffer.write(word)
+  end
+
+  def has_space?(word)
+    required_space = @buffer.size == 0 ? word.length : SPACE.length + word.length
+
+    @buffer.size + required_space <= @column
+  end
+
+  def to_s
+    @buffer.string
   end
 end

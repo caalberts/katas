@@ -68,3 +68,68 @@ RSpec.describe Parser do
     end
   end
 end
+
+RSpec.describe Line do
+  let(:column) { 8 }
+
+  subject { described_class.new(column) }
+
+  describe '#append' do
+    context 'on empty line' do
+      it 'appends the word' do
+        subject.append('foo')
+
+        expect(subject.to_s).to eq('foo')
+      end
+    end
+
+    context 'on line with existing word' do
+      it 'appends the word with a space separation' do
+        subject.append('foo')
+        subject.append('bar')
+
+        expect(subject.to_s).to eq('foo bar')
+      end
+    end
+  end
+
+  describe '#has_space?' do
+    context 'on empty line' do
+      context 'when there is still space for new word' do
+        it 'returns true' do
+          expect(subject.has_space?('foobarba')).to be_truthy
+        end
+      end
+
+      context 'when there is not enough space for new word' do
+        it 'returns false' do
+          expect(subject.has_space?('foobarbaz')).to be_falsey
+        end
+      end
+    end
+
+    context 'on line with existing word' do
+      before do
+        subject.append('foo')
+      end
+
+      context 'when there is still space for new word' do
+        it 'returns true' do
+          expect(subject.has_space?('bar')).to be_truthy
+        end
+      end
+
+      context 'when there is not enough space for new word' do
+        it 'returns false' do
+          expect(subject.has_space?('barbaz')).to be_falsey
+        end
+      end
+
+      context 'when there is not enough space for new word and the space' do
+        it 'returns false' do
+          expect(subject.has_space?('barba')).to be_falsey
+        end
+      end
+    end
+  end
+end
