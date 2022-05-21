@@ -1,4 +1,4 @@
-require_relative '../lib/word_wrap'
+require_relative './word_wrap'
 
 RSpec.describe WordWrap do
   subject { described_class.wrap(string, column) }
