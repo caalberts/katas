@@ -5,12 +5,13 @@ class Character
   MAX_HEALTH_LOW = 1000
   MAX_HEALTH_HIGH = 1500
 
-  attr_reader :health, :level
+  attr_reader :health, :level, :factions
 
   def initialize(level: 1)
     @health = 1000
     @alive = true
     @level = level
+    @factions = []
   end
 
   def alive?

@@ -16,6 +16,10 @@ RSpec.describe Character do
     it 'is at level 1' do
       expect(subject.level).to eq(1)
     end
+
+    it 'does not have any factions' do
+      expect(subject.factions).to be_empty
+    end
   end
 
   describe '#deal_damage' do
