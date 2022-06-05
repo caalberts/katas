@@ -1,7 +1,5 @@
 InvalidActionError = Class.new(StandardError)
 
-Faction = Struct.new(:name, keyword_init: true)
-
 class Character
   HIGH_LEVEL = 6
   MAX_HEALTH_LOW = 1000
@@ -21,7 +19,10 @@ class Character
   end
 
   def join(*factions)
-    @factions.append(*factions)
+    factions.each do |faction|
+      @factions.append(faction)
+      faction.add_member(self)
+    end
   end
 
   def leave(*factions)
@@ -66,5 +67,18 @@ class Character
 
   def high_level?
     level >= HIGH_LEVEL
+  end
+end
+
+class Faction
+  attr_reader :name, :members
+
+  def initialize(name:)
+    @name = name
+    @members = []
+  end
+
+  def add_member(member)
+    @members.append(member)
   end
 end

@@ -161,6 +161,12 @@ RSpec.describe Character do
         expect(subject.factions).to contain_exactly(faction_1, faction_2, faction_3)
       end
     end
+
+    it 'adds member to the faction' do
+      subject.join(faction_1)
+
+      expect(faction_1.members).to contain_exactly(subject)
+    end
   end
 
   describe '#leave' do
@@ -188,6 +194,26 @@ RSpec.describe Character do
       subject.leave(faction_3)
 
       expect(subject.factions).to contain_exactly(faction_1, faction_2)
+    end
+  end
+end
+
+RSpec.describe Faction do
+  subject { Faction.new(name: 'The Order of Phoenix') }
+
+  describe 'initial faction' do
+    it 'has no members' do
+      expect(subject.members).to be_empty
+    end
+  end
+
+  describe '#add_member' do
+    let(:member) { Character.new }
+
+    it 'adds member to faction' do
+      subject.add_member(member)
+
+      expect(subject.members).to contain_exactly(member)
     end
   end
 end
