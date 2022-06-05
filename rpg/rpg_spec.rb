@@ -33,6 +33,26 @@ RSpec.describe Character do
     end
   end
 
+  describe '#heal' do
+    before do
+      subject.take_damage(100)
+    end
+
+    it 'heals itself by the given amount' do
+      subject.heal(50)
+
+      expect(subject.health).to eq(950)
+    end
+
+    context 'when healing beyond maximum health' do
+      it 'can only heal up to the maximum health' do
+        subject.heal(150)
+
+        expect(subject.health).to eq(1000)
+      end
+    end
+  end
+
   describe '#take_damage' do
     it 'reduces health' do
       subject.take_damage(10)
