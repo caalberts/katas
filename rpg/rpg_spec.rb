@@ -29,7 +29,7 @@ RSpec.describe Character do
     end
 
     it 'cannot deals damage to itself' do
-      expect { subject.deal_damage(subject, 1) }.to raise_error(InvalidTargetError, 'a character cannot deal damage to itself')
+      expect { subject.deal_damage(subject, 1) }.to raise_error(InvalidActionError, 'a character cannot deal damage to itself')
     end
   end
 
@@ -49,6 +49,16 @@ RSpec.describe Character do
         subject.heal(150)
 
         expect(subject.health).to eq(1000)
+      end
+    end
+
+    context 'when character is dead' do
+      before do
+        subject.take_damage(1001)
+      end
+
+      it 'cannot heal itself' do
+        expect { subject.heal(1) }.to raise_error(InvalidActionError, 'a dead character cannot heal')
       end
     end
   end

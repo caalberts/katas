@@ -1,4 +1,4 @@
-InvalidTargetError = Class.new(StandardError)
+InvalidActionError = Class.new(StandardError)
 
 class Character
   MAX_HEALTH = 1000
@@ -16,11 +16,14 @@ class Character
   end
 
   def deal_damage(target, amount)
-    raise InvalidTargetError, 'a character cannot deal damage to itself' if target == self
+    raise InvalidActionError, 'a character cannot deal damage to itself' if target == self
+
     target.take_damage(amount)
   end
 
   def heal(amount)
+    raise InvalidActionError, 'a dead character cannot heal' unless alive?
+
     @health += amount
     @health = MAX_HEALTH if @health > MAX_HEALTH
   end
