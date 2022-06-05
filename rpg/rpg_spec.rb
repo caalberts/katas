@@ -35,5 +35,32 @@ RSpec.describe Character do
 
       expect(subject.health).to eq(990)
     end
+
+    context 'remaining health is greater than 0' do
+      it 'is still alive' do
+        subject.damaged(999)
+
+        expect(subject.alive?).to be(true)
+      end
+    end
+
+
+    context 'remaining health is 0' do
+      it 'dies' do
+        subject.damage(500)
+        subject.damage(500)
+
+        expect(subject.alive?).to be(false)
+      end
+    end
+
+    context 'remaining health is less than 0' do
+      it 'dies' do
+        subject.damage(500)
+        subject.damage(501)
+
+        expect(subject.alive?).to be(false)
+      end
+    end
   end
 end

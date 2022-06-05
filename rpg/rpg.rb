@@ -17,5 +17,6 @@ class Character
 
   def damaged(amount)
     @health -= amount
+    @alive = false if @health <= 0
   end
 end
