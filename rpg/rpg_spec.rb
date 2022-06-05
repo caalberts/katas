@@ -88,8 +88,35 @@ RSpec.describe Character do
         end
 
         it 'cannot heal a dead target' do
-          expect { subject.heal(target, 1) }.to raise_error(InvalidActionError, 'a dead character cannot heal')
+          expect { subject.heal(target, 1) }.to raise_error(InvalidActionError, 'a dead character cannot be healed')
         end
+      end
+    end
+
+    context 'when a target is an ally' do
+      let(:alliance) { Faction.new(name: 'Allies') }
+
+      before do
+        subject.join(alliance)
+        target.join(alliance)
+      end
+
+      let(:target) { Character.new }
+      let(:amount) { 100 }
+
+      it 'increases target health by the given amount' do
+        expect(target).to receive(:increase_health).with(amount)
+
+        subject.heal(target, amount)
+      end
+    end
+
+    context 'when a target is not an ally' do
+      let(:target) { Character.new }
+      let(:amount) { 100 }
+
+      it 'cannot heal a non-ally' do
+        expect { subject.heal(target, amount) }.to raise_error(InvalidActionError, 'a non-ally cannot be healed')
       end
     end
   end
@@ -140,7 +167,6 @@ RSpec.describe Character do
         expect(subject.alive?).to be(true)
       end
     end
-
 
     context 'remaining health is 0' do
       it 'dies' do

@@ -49,7 +49,8 @@ class Character
   end
 
   def heal(target, amount)
-    raise InvalidActionError, 'a dead character cannot heal' unless alive?
+    raise InvalidActionError, 'a dead character cannot be healed' unless alive?
+    raise InvalidActionError, 'a non-ally cannot be healed' unless allied_with?(target) || target == self
 
     target.increase_health(amount)
   end
