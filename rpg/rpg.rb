@@ -10,4 +10,12 @@ class Character
   def alive?
     @alive
   end
+
+  def attack(target, damage)
+    target.damaged(damage)
+  end
+
+  def damaged(amount)
+    @health -= amount
+  end
 end
