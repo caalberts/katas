@@ -1,5 +1,7 @@
 InvalidActionError = Class.new(StandardError)
 
+Faction = Struct.new(:name, keyword_init: true)
+
 class Character
   HIGH_LEVEL = 6
   MAX_HEALTH_LOW = 1000
@@ -16,6 +18,10 @@ class Character
 
   def alive?
     @alive
+  end
+
+  def join(*factions)
+    @factions.append(*factions)
   end
 
   def damage_modifier_for(target)

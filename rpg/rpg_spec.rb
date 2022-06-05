@@ -132,4 +132,34 @@ RSpec.describe Character do
       end
     end
   end
+
+  describe '#join' do
+    let(:faction_1) { Faction.new(name: 'The Harpers') }
+    let(:faction_2) { Faction.new(name: 'The Order of the Gauntlet') }
+    let(:faction_3) { Faction.new(name: 'The Emerald Enclave') }
+
+    it 'joins a faction' do
+      subject.join(faction_1)
+
+      expect(subject.factions).to contain_exactly(faction_1)
+    end
+
+    it 'can join multiple factions' do
+      subject.join(faction_1, faction_2)
+
+      expect(subject.factions).to contain_exactly(faction_1, faction_2)
+    end
+
+    context 'with existing faction' do
+      before do
+        subject.join(faction_1)
+      end
+
+      it 'can join additional factions' do
+        subject.join(faction_2, faction_3)
+
+        expect(subject.factions).to contain_exactly(faction_1, faction_2, faction_3)
+      end
+    end
+  end
 end
