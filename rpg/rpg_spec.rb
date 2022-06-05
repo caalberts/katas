@@ -27,6 +27,10 @@ RSpec.describe Character do
 
       expect(target.health).to eq(900)
     end
+
+    it 'cannot deals damage to itself' do
+      expect { subject.deal_damage(subject, 1) }.to raise_error(InvalidTargetError, 'a character cannot deal damage to itself')
+    end
   end
 
   describe '#take_damage' do

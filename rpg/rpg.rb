@@ -1,3 +1,5 @@
+InvalidTargetError = Class.new(StandardError)
+
 class Character
   attr_reader :health, :level
 
@@ -12,6 +14,7 @@ class Character
   end
 
   def deal_damage(target, amount)
+    raise InvalidTargetError, 'a character cannot deal damage to itself' if target == self
     target.take_damage(amount)
   end
 
