@@ -5,10 +5,10 @@ class Character
 
   attr_reader :health, :level
 
-  def initialize
+  def initialize(level: 1)
     @health = 1000
     @alive = true
-    @level = 1
+    @level = level
   end
 
   def alive?
