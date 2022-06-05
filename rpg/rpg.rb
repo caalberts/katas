@@ -17,10 +17,22 @@ class Character
     @alive
   end
 
+  def damage_modifier_for(target)
+    level_difference = target.level - self.level
+
+    case
+    when level_difference >= 5 then 0.5
+    when level_difference <= -5 then 1.5
+    else 1
+    end
+  end
+
   def deal_damage(target, amount)
     raise InvalidActionError, 'a character cannot deal damage to itself' if target == self
 
-    target.take_damage(amount)
+    modifier = damage_modifier_for(target)
+
+    target.take_damage(modifier * amount)
   end
 
   def heal(amount)

@@ -30,6 +30,28 @@ RSpec.describe Character do
     it 'cannot deals damage to itself' do
       expect { subject.deal_damage(subject, 1) }.to raise_error(InvalidActionError, 'a character cannot deal damage to itself')
     end
+
+    context 'when target is 5 or more levels above the attacker' do
+      let(:target) { Character.new(level: subject.level + 5) }
+
+      it 'deals 50% less damage' do
+        subject.deal_damage(target, 100)
+
+        expect(target.health).to eq(950)
+      end
+    end
+
+    context 'when target is 5 or more levels below the attacker' do
+      subject { Character.new(level: 10) }
+
+      let(:target) { Character.new(level: subject.level - 5) }
+
+      it 'deals 50% more damage' do
+        subject.deal_damage(target, 100)
+
+        expect(target.health).to eq(850)
+      end
+    end
   end
 
   describe '#heal' do
