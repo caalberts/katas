@@ -31,7 +31,7 @@ RSpec.describe Character do
       expect(target.health).to eq(900)
     end
 
-    it 'cannot deals damage to itself' do
+    it 'cannot deal damage to itself' do
       expect { subject.deal_damage(subject, 1) }.to raise_error(InvalidActionError, 'a character cannot deal damage to itself')
     end
 
@@ -54,6 +54,19 @@ RSpec.describe Character do
         subject.deal_damage(target, 100)
 
         expect(target.health).to eq(850)
+      end
+    end
+
+    context 'when target is an ally' do
+      let(:alliance) { Faction.new(name: 'Allies') }
+
+      before do
+        subject.join(alliance)
+        target.join(alliance)
+      end
+
+      it 'cannot deal damage to an ally' do
+        expect { subject.deal_damage(target, 1) }.to raise_error(InvalidActionError, 'a character cannot deal damage to an ally')
       end
     end
   end

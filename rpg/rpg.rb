@@ -41,6 +41,7 @@ class Character
 
   def deal_damage(target, amount)
     raise InvalidActionError, 'a character cannot deal damage to itself' if target == self
+    raise InvalidActionError, 'a character cannot deal damage to an ally' if allied_with?(target)
 
     modifier = damage_modifier_for(target)
 
@@ -67,6 +68,10 @@ class Character
 
   def high_level?
     level >= HIGH_LEVEL
+  end
+
+  def allied_with?(target)
+    (target.factions & self.factions).any?
   end
 end
 
