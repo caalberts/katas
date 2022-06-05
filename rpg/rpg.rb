@@ -48,7 +48,7 @@ class Character
     target.take_damage(modifier * amount)
   end
 
-  def heal(amount)
+  def heal(target, amount)
     raise InvalidActionError, 'a dead character cannot heal' unless alive?
 
     @health += amount

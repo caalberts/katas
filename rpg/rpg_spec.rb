@@ -72,43 +72,47 @@ RSpec.describe Character do
   end
 
   describe '#heal' do
-    before do
-      subject.take_damage(100)
-    end
+    context 'when healing itself' do
+      let(:target) { subject }
 
-    it 'heals itself by the given amount' do
-      subject.heal(50)
-
-      expect(subject.health).to eq(950)
-    end
-
-    context 'when character level is below 6' do
-      subject { Character.new(level: 5) }
-
-      it 'has maximum health of 1000' do
-        subject.heal(2000)
-
-        expect(subject.health).to eq(1000)
-      end
-    end
-
-    context 'when character level is 6' do
-      subject { Character.new(level: 6) }
-
-      it 'has maximum health of 1500' do
-        subject.heal(2000)
-
-        expect(subject.health).to eq(1500)
-      end
-    end
-
-    context 'when character is dead' do
       before do
-        subject.take_damage(1001)
+        target.take_damage(100)
       end
 
-      it 'cannot heal itself' do
-        expect { subject.heal(1) }.to raise_error(InvalidActionError, 'a dead character cannot heal')
+      it 'heals by the given amount' do
+        subject.heal(target, 50)
+
+        expect(target.health).to eq(950)
+      end
+
+      context 'when character level is below 6' do
+        subject { Character.new(level: 5) }
+
+        it 'has maximum health of 1000' do
+          subject.heal(target, 2000)
+
+          expect(target.health).to eq(1000)
+        end
+      end
+
+      context 'when character level is 6' do
+        subject { Character.new(level: 6) }
+
+        it 'has maximum health of 1500' do
+          subject.heal(target, 2000)
+
+          expect(target.health).to eq(1500)
+        end
+      end
+
+      context 'when character is dead' do
+        before do
+          subject.take_damage(1001)
+        end
+
+        it 'cannot heal itself' do
+          expect { subject.heal(target, 1) }.to raise_error(InvalidActionError, 'a dead character cannot heal')
+        end
       end
     end
   end
