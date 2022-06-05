@@ -1,7 +1,7 @@
 require_relative './rpg'
 
-RSpec.describe Character do
-  subject { Character.new }
+RSpec.describe RPG::Character do
+  subject { described_class.new }
 
   describe 'initial character' do
 
@@ -23,7 +23,7 @@ RSpec.describe Character do
   end
 
   describe '#deal_damage' do
-    let(:target) { Character.new }
+    let(:target) { described_class.new }
 
     it 'deals damage to the target' do
       subject.deal_damage(target, 100)
@@ -32,11 +32,11 @@ RSpec.describe Character do
     end
 
     it 'cannot deal damage to itself' do
-      expect { subject.deal_damage(subject, 1) }.to raise_error(InvalidActionError, 'a character cannot deal damage to itself')
+      expect { subject.deal_damage(subject, 1) }.to raise_error(RPG::InvalidActionError, 'a character cannot deal damage to itself')
     end
 
     context 'when target is 5 or more levels above the attacker' do
-      let(:target) { Character.new(level: subject.level + 5) }
+      let(:target) { described_class.new(level: subject.level + 5) }
 
       it 'deals 50% less damage' do
         subject.deal_damage(target, 100)
@@ -46,9 +46,9 @@ RSpec.describe Character do
     end
 
     context 'when target is 5 or more levels below the attacker' do
-      subject { Character.new(level: 10) }
+      subject { described_class.new(level: 10) }
 
-      let(:target) { Character.new(level: subject.level - 5) }
+      let(:target) { described_class.new(level: subject.level - 5) }
 
       it 'deals 50% more damage' do
         subject.deal_damage(target, 100)
@@ -58,7 +58,7 @@ RSpec.describe Character do
     end
 
     context 'when target is an ally' do
-      let(:alliance) { Faction.new(name: 'Allies') }
+      let(:alliance) { RPG::Faction.new(name: 'Allies') }
 
       before do
         subject.join(alliance)
@@ -66,7 +66,7 @@ RSpec.describe Character do
       end
 
       it 'cannot deal damage to an ally' do
-        expect { subject.deal_damage(target, 1) }.to raise_error(InvalidActionError, 'a character cannot deal damage to an ally')
+        expect { subject.deal_damage(target, 1) }.to raise_error(RPG::InvalidActionError, 'a character cannot deal damage to an ally')
       end
     end
   end
@@ -88,20 +88,20 @@ RSpec.describe Character do
         end
 
         it 'cannot heal a dead target' do
-          expect { subject.heal(target, 1) }.to raise_error(InvalidActionError, 'a dead character cannot be healed')
+          expect { subject.heal(target, 1) }.to raise_error(RPG::InvalidActionError, 'a dead character cannot be healed')
         end
       end
     end
 
     context 'when a target is an ally' do
-      let(:alliance) { Faction.new(name: 'Allies') }
+      let(:alliance) { RPG::Faction.new(name: 'Allies') }
 
       before do
         subject.join(alliance)
         target.join(alliance)
       end
 
-      let(:target) { Character.new }
+      let(:target) { described_class.new }
       let(:amount) { 100 }
 
       it 'increases target health by the given amount' do
@@ -112,11 +112,11 @@ RSpec.describe Character do
     end
 
     context 'when a target is not an ally' do
-      let(:target) { Character.new }
+      let(:target) { described_class.new }
       let(:amount) { 100 }
 
       it 'cannot heal a non-ally' do
-        expect { subject.heal(target, amount) }.to raise_error(InvalidActionError, 'a non-ally cannot be healed')
+        expect { subject.heal(target, amount) }.to raise_error(RPG::InvalidActionError, 'a non-ally cannot be healed')
       end
     end
   end
@@ -133,7 +133,7 @@ RSpec.describe Character do
     end
 
     context 'when character level is below 6' do
-      subject { Character.new(level: 5) }
+      subject { described_class.new(level: 5) }
 
       it 'has maximum health of 1000' do
         subject.increase_health(2000)
@@ -143,7 +143,7 @@ RSpec.describe Character do
     end
 
     context 'when character level is 6' do
-      subject { Character.new(level: 6) }
+      subject { described_class.new(level: 6) }
 
       it 'has maximum health of 1500' do
         subject.increase_health(2000)
@@ -186,9 +186,9 @@ RSpec.describe Character do
   end
 
   describe '#join' do
-    let(:faction_1) { Faction.new(name: 'The Harpers') }
-    let(:faction_2) { Faction.new(name: 'The Order of the Gauntlet') }
-    let(:faction_3) { Faction.new(name: 'The Emerald Enclave') }
+    let(:faction_1) { RPG::Faction.new(name: 'The Harpers') }
+    let(:faction_2) { RPG::Faction.new(name: 'The Order of the Gauntlet') }
+    let(:faction_3) { RPG::Faction.new(name: 'The Emerald Enclave') }
 
     it 'joins a faction' do
       subject.join(faction_1)
@@ -222,9 +222,9 @@ RSpec.describe Character do
   end
 
   describe '#leave' do
-    let(:faction_1) { Faction.new(name: 'The Harpers') }
-    let(:faction_2) { Faction.new(name: 'The Order of the Gauntlet') }
-    let(:faction_3) { Faction.new(name: 'The Emerald Enclave') }
+    let(:faction_1) { RPG::Faction.new(name: 'The Harpers') }
+    let(:faction_2) { RPG::Faction.new(name: 'The Order of the Gauntlet') }
+    let(:faction_3) { RPG::Faction.new(name: 'The Emerald Enclave') }
 
     before do
       subject.join(faction_1, faction_2)
@@ -250,8 +250,8 @@ RSpec.describe Character do
   end
 end
 
-RSpec.describe Faction do
-  subject { Faction.new(name: 'The Order of Phoenix') }
+RSpec.describe RPG::Faction do
+  subject { RPG::Faction.new(name: 'The Order of Phoenix') }
 
   describe 'initial faction' do
     it 'has no members' do
@@ -260,7 +260,7 @@ RSpec.describe Faction do
   end
 
   describe '#add_member' do
-    let(:member) { Character.new }
+    let(:member) { RPG::Character.new }
 
     it 'adds member to faction' do
       subject.add_member(member)
