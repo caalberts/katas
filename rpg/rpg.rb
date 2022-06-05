@@ -51,6 +51,10 @@ class Character
   def heal(target, amount)
     raise InvalidActionError, 'a dead character cannot heal' unless alive?
 
+    target.increase_health(amount)
+  end
+
+  def increase_health(amount)
     @health += amount
     @health = max_health if @health > max_health
   end
