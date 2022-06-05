@@ -43,11 +43,23 @@ RSpec.describe Character do
       expect(subject.health).to eq(950)
     end
 
-    context 'when healing beyond maximum health' do
-      it 'can only heal up to the maximum health' do
-        subject.heal(150)
+    context 'when character level is below 6' do
+      subject { Character.new(level: 5) }
+
+      it 'has maximum health of 1000' do
+        subject.heal(2000)
 
         expect(subject.health).to eq(1000)
+      end
+    end
+
+    context 'when character level is 6' do
+      subject { Character.new(level: 6) }
+
+      it 'has maximum health of 1500' do
+        subject.heal(2000)
+
+        expect(subject.health).to eq(1500)
       end
     end
 

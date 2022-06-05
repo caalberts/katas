@@ -1,7 +1,9 @@
 InvalidActionError = Class.new(StandardError)
 
 class Character
-  MAX_HEALTH = 1000
+  HIGH_LEVEL = 6
+  MAX_HEALTH_LOW = 1000
+  MAX_HEALTH_HIGH = 1500
 
   attr_reader :health, :level
 
@@ -25,11 +27,21 @@ class Character
     raise InvalidActionError, 'a dead character cannot heal' unless alive?
 
     @health += amount
-    @health = MAX_HEALTH if @health > MAX_HEALTH
+    @health = max_health if @health > max_health
   end
 
   def take_damage(amount)
     @health -= amount
     @alive = false if @health <= 0
+  end
+
+  private
+
+  def max_health
+    high_level? ? MAX_HEALTH_HIGH : MAX_HEALTH_LOW
+  end
+
+  def high_level?
+    level >= HIGH_LEVEL
   end
 end
