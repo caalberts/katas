@@ -19,26 +19,26 @@ RSpec.describe Character do
     end
   end
 
-  describe '#attack' do
+  describe '#deal_damage' do
     let(:target) { Character.new }
 
     it 'deals damage to the target' do
-      subject.attack(target, 100)
+      subject.deal_damage(target, 100)
 
       expect(target.health).to eq(900)
     end
   end
 
-  describe '#damaged' do
+  describe '#take_damage' do
     it 'reduces health' do
-      subject.damaged(10)
+      subject.take_damage(10)
 
       expect(subject.health).to eq(990)
     end
 
     context 'remaining health is greater than 0' do
       it 'is still alive' do
-        subject.damaged(999)
+        subject.take_damage(999)
 
         expect(subject.alive?).to be(true)
       end
@@ -47,8 +47,7 @@ RSpec.describe Character do
 
     context 'remaining health is 0' do
       it 'dies' do
-        subject.damage(500)
-        subject.damage(500)
+        subject.take_damage(1000)
 
         expect(subject.alive?).to be(false)
       end
@@ -56,8 +55,7 @@ RSpec.describe Character do
 
     context 'remaining health is less than 0' do
       it 'dies' do
-        subject.damage(500)
-        subject.damage(501)
+        subject.take_damage(1001)
 
         expect(subject.alive?).to be(false)
       end

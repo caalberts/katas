@@ -11,11 +11,11 @@ class Character
     @alive
   end
 
-  def attack(target, damage)
-    target.damaged(damage)
+  def deal_damage(target, amount)
+    target.take_damage(amount)
   end
 
-  def damaged(amount)
+  def take_damage(amount)
     @health -= amount
     @alive = false if @health <= 0
   end
