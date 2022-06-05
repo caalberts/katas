@@ -162,4 +162,32 @@ RSpec.describe Character do
       end
     end
   end
+
+  describe '#leave' do
+    let(:faction_1) { Faction.new(name: 'The Harpers') }
+    let(:faction_2) { Faction.new(name: 'The Order of the Gauntlet') }
+    let(:faction_3) { Faction.new(name: 'The Emerald Enclave') }
+
+    before do
+      subject.join(faction_1, faction_2)
+    end
+
+    it 'leaves a faction' do
+      subject.leave(faction_1)
+
+      expect(subject.factions).to contain_exactly(faction_2)
+    end
+
+    it 'can leave multiple factions' do
+      subject.leave(faction_1, faction_2)
+
+      expect(subject.factions).to be_empty
+    end
+
+    it 'does not do anything if it is not a member' do
+      subject.leave(faction_3)
+
+      expect(subject.factions).to contain_exactly(faction_1, faction_2)
+    end
+  end
 end

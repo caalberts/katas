@@ -24,6 +24,10 @@ class Character
     @factions.append(*factions)
   end
 
+  def leave(*factions)
+    @factions -= factions
+  end
+
   def damage_modifier_for(target)
     level_difference = target.level - self.level
 
