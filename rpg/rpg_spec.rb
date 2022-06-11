@@ -250,6 +250,50 @@ RSpec.describe RPG::Character do
   end
 end
 
+RSpec.describe RPG::MagicalObject do
+  let(:health) { 100 }
+
+  subject { described_class.new(health: health) }
+
+  describe 'initial magical object' do
+    it 'starts with some health' do
+      expect(subject.health).to eq(health)
+    end
+  end
+
+  describe '#take_damage' do
+    it 'reduces health' do
+      subject.take_damage(10)
+
+      expect(subject.health).to eq(health - 10)
+    end
+  end
+
+  describe '#destroyed?' do
+    context 'remaining health is more than 0' do
+      it 'is not destroyed' do
+        expect(subject.destroyed?).to be(false)
+      end
+    end
+
+    context 'remaining health is 0' do
+      it 'is destroyed' do
+        subject.take_damage(health)
+
+        expect(subject.destroyed?).to be(true)
+      end
+    end
+
+    context 'remaining health is less than 0' do
+      it 'is destroyed' do
+        subject.take_damage(health + 1)
+
+        expect(subject.destroyed?).to be(true)
+      end
+    end
+  end
+end
+
 RSpec.describe RPG::Faction do
   subject { RPG::Faction.new(name: 'The Order of Phoenix') }
 

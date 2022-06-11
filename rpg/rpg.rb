@@ -81,6 +81,22 @@ module RPG
     end
   end
 
+  class MagicalObject
+    attr_reader :health
+
+    def initialize(health:)
+      @health = health
+    end
+
+    def take_damage(amount)
+      @health -= amount
+    end
+
+    def destroyed?
+      @health <= 0
+    end
+  end
+
   class Faction
     attr_reader :name, :members
 
