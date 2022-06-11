@@ -10,13 +10,12 @@ module RPG
 
     def initialize(level: 1)
       @health = 1000
-      @alive = true
       @level = level
       @factions = []
     end
 
     def alive?
-      @alive
+      @health > 0
     end
 
     def join(*factions)
@@ -63,7 +62,6 @@ module RPG
 
     def take_damage(amount)
       @health -= amount
-      @alive = false if @health <= 0
     end
 
     private
