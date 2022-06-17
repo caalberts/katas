@@ -27,5 +27,15 @@ RSpec.describe RPG::Game do
     it 'adds faction to the game' do
       expect(game.factions).to contain_exactly(faction)
     end
+
+    describe '#create_item' do
+      let(:health) { 100 }
+
+      subject(:item) { game.create_item(health: health) }
+
+      it 'adds item to the game' do
+        expect(game.items).to contain_exactly(item)
+      end
+    end
   end
 end
