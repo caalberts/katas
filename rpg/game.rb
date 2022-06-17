@@ -11,7 +11,7 @@ module RPG
     end
 
     def create_character(level: 1)
-      RPG::Character.new(level: level).tap do |character|
+      RPG::Character.new(level: level, game: self).tap do |character|
         @characters << character
       end
     end

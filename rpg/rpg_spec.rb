@@ -1,10 +1,11 @@
-require_relative './rpg'
+require_relative './game'
 
 RSpec.describe RPG::Character do
-  subject { described_class.new }
+  let(:game) { instance_double(RPG::Game) }
+
+  subject { described_class.new(game: game) }
 
   describe 'initial character' do
-
     it 'starts with 1000 health' do
       expect(subject.health).to eq(1000)
     end
@@ -23,7 +24,7 @@ RSpec.describe RPG::Character do
   end
 
   describe '#deal_damage' do
-    let(:target) { described_class.new }
+    let(:target) { described_class.new(game: game) }
 
     it 'deals damage to the target' do
       subject.deal_damage(target, 100)
@@ -36,7 +37,7 @@ RSpec.describe RPG::Character do
     end
 
     context 'when target is 5 or more levels above the attacker' do
-      let(:target) { described_class.new(level: subject.level + 5) }
+      let(:target) { described_class.new(level: subject.level + 5, game: game) }
 
       it 'deals 50% less damage' do
         subject.deal_damage(target, 100)
@@ -46,9 +47,9 @@ RSpec.describe RPG::Character do
     end
 
     context 'when target is 5 or more levels below the attacker' do
-      subject { described_class.new(level: 10) }
+      subject { described_class.new(level: 10, game: game) }
 
-      let(:target) { described_class.new(level: subject.level - 5) }
+      let(:target) { described_class.new(level: subject.level - 5, game: game) }
 
       it 'deals 50% more damage' do
         subject.deal_damage(target, 100)
@@ -101,7 +102,7 @@ RSpec.describe RPG::Character do
         target.join(alliance)
       end
 
-      let(:target) { described_class.new }
+      let(:target) { described_class.new(game: game) }
       let(:amount) { 100 }
 
       it 'increases target health by the given amount' do
@@ -112,7 +113,7 @@ RSpec.describe RPG::Character do
     end
 
     context 'when a target is not an ally' do
-      let(:target) { described_class.new }
+      let(:target) { described_class.new(game: game) }
       let(:amount) { 100 }
 
       it 'cannot heal a non-ally' do
@@ -133,7 +134,7 @@ RSpec.describe RPG::Character do
     end
 
     context 'when character level is below 6' do
-      subject { described_class.new(level: 5) }
+      subject { described_class.new(level: 5, game: game) }
 
       it 'has maximum health of 1000' do
         subject.increase_health(2000)
@@ -143,7 +144,7 @@ RSpec.describe RPG::Character do
     end
 
     context 'when character level is 6' do
-      subject { described_class.new(level: 6) }
+      subject { described_class.new(level: 6, game: game) }
 
       it 'has maximum health of 1500' do
         subject.increase_health(2000)
@@ -295,6 +296,8 @@ RSpec.describe RPG::MagicalObject do
 end
 
 RSpec.describe RPG::Faction do
+  let(:game) { RPG::Game.new }
+
   subject { RPG::Faction.new(name: 'The Order of Phoenix') }
 
   describe 'initial faction' do
@@ -304,7 +307,7 @@ RSpec.describe RPG::Faction do
   end
 
   describe '#add_member' do
-    let(:member) { RPG::Character.new }
+    let(:member) { RPG::Character.new(game: game) }
 
     it 'adds member to faction' do
       subject.add_member(member)

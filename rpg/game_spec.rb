@@ -49,4 +49,8 @@ RSpec.describe RPG::Game do
       end
     end
   end
+
+  describe '#deal_damage' do
+
+  end
 end

@@ -8,10 +8,11 @@ module RPG
 
     attr_reader :health, :level, :factions
 
-    def initialize(level: 1)
+    def initialize(level: 1, game:)
       @health = 1000
       @level = level
       @factions = []
+      @game = game
     end
 
     def alive?
@@ -65,6 +66,8 @@ module RPG
     end
 
     private
+
+    attr_reader :game
 
     def max_health
       high_level? ? MAX_HEALTH_HIGH : MAX_HEALTH_LOW
