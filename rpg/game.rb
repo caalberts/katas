@@ -6,7 +6,7 @@ module RPG
 
     def initialize
       @characters = []
-      @factions = []
+      @factions = {}
       @items = []
     end
 
@@ -18,7 +18,7 @@ module RPG
 
     def create_faction(name:)
       RPG::Faction.new(name: name).tap do |faction|
-        @factions << faction
+        @factions[faction] = []
       end
     end
 
@@ -30,10 +30,25 @@ module RPG
 
     def deal_damage(from:, to:, amount:)
       return if from == to
+      return if allied?(from, to)
 
       modifier = damage_modifier_for(source: from, target: to)
 
       to.take_damage(amount * modifier)
+    end
+
+    def join_faction(member:, factions:)
+      factions.each do |faction|
+        self.factions[faction] ||= []
+        self.factions[faction] << member
+      end
+    end
+
+    def leave_faction(member:, factions:)
+      factions.each do |faction|
+        self.factions[faction] ||= []
+        self.factions[faction].delete_if { |m| m == member }
+      end
     end
 
     private
@@ -46,6 +61,10 @@ module RPG
       when level_difference <= -5 then 1.5
       else 1
       end
+    end
+
+    def allied?(member1, member2)
+      self.factions.any? { |_faction, members| members.include?(member1) && members.include?(member2) }
     end
   end
 end

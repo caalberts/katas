@@ -36,7 +36,7 @@ RSpec.describe RPG::Game do
     end
 
     it 'adds faction to the game' do
-      expect(game.factions).to contain_exactly(faction)
+      expect(game.factions[faction]).to be_empty
     end
 
     describe '#create_item' do
@@ -99,6 +99,57 @@ RSpec.describe RPG::Game do
 
         deal_damage
       end
+    end
+
+    context 'when the characters are allied' do
+      let(:source) { instance_double(RPG::Character) }
+      let(:target) { instance_double(RPG::Character) }
+      let(:faction) { instance_double(RPG::Faction) }
+
+      before do
+        game.join_faction(member: source, factions: [faction])
+        game.join_faction(member: target, factions: [faction])
+      end
+
+      it 'does not ask the target to take damage' do
+        expect(target).not_to receive(:take_damage)
+
+        deal_damage
+      end
+    end
+  end
+
+  describe '#join_faction' do
+    let(:member) { instance_double(RPG::Character) }
+    let(:faction1) { instance_double(RPG::Faction) }
+    let(:faction2) { instance_double(RPG::Faction) }
+
+    subject(:join_faction) { game.join_faction(member: member, factions: [faction1, faction2]) }
+
+    it 'adds member to the factions' do
+      join_faction
+
+      expect(game.factions[faction1]).to contain_exactly(member)
+      expect(game.factions[faction2]).to contain_exactly(member)
+    end
+  end
+
+  describe '#leave_faction' do
+    let(:member) { instance_double(RPG::Character) }
+    let(:faction1) { instance_double(RPG::Faction) }
+    let(:faction2) { instance_double(RPG::Faction) }
+
+    subject(:leave_faction) { game.leave_faction(member: member, factions: [faction1, faction2]) }
+
+    before do
+      game.join_faction(member: member, factions: [faction1, faction2])
+    end
+
+    it 'removes member from the factions' do
+      leave_faction
+
+      expect(game.factions[faction1]).to be_empty
+      expect(game.factions[faction2]).to be_empty
     end
   end
 end

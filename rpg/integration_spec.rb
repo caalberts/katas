@@ -8,6 +8,22 @@ RSpec.describe 'RPG Integration Specs' do
   let!(:anakin) { game.create_character(level: 59) }
   let!(:youngling) { game.create_character(level: 10) }
 
+  describe 'character are in factions' do
+    before do
+      obi_wan.join(jedis)
+      youngling.join(jedis)
+
+      anakin.join(siths)
+    end
+
+    describe 'character attacking an ally' do
+      it 'does not do anything' do
+        obi_wan.deal_damage(youngling, 100)
+        expect(youngling.health).to eq(1000)
+      end
+    end
+  end
+
   describe 'character attacking another character' do
     context 'when character levels are similar' do
       it 'applies damage to the target character' do

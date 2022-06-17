@@ -17,10 +17,6 @@ RSpec.describe RPG::Character do
     it 'is at level 1' do
       expect(subject.level).to eq(1)
     end
-
-    it 'does not have any factions' do
-      expect(subject.factions).to be_empty
-    end
   end
 
   describe '#deal_damage' do
@@ -32,22 +28,9 @@ RSpec.describe RPG::Character do
 
       subject.deal_damage(target, amount)
     end
-
-    context 'when target is an ally' do
-      let(:alliance) { RPG::Faction.new(name: 'Allies') }
-
-      before do
-        subject.join(alliance)
-        target.join(alliance)
-      end
-
-      it 'cannot deal damage to an ally' do
-        expect { subject.deal_damage(target, 1) }.to raise_error(RPG::InvalidActionError, 'a character cannot deal damage to an ally')
-      end
-    end
   end
 
-  describe '#heal' do
+  xdescribe '#heal' do
     context 'when healing itself' do
       let(:target) { subject }
       let(:amount) { 100 }
@@ -162,66 +145,24 @@ RSpec.describe RPG::Character do
   end
 
   describe '#join' do
-    let(:faction_1) { RPG::Faction.new(name: 'The Harpers') }
-    let(:faction_2) { RPG::Faction.new(name: 'The Order of the Gauntlet') }
-    let(:faction_3) { RPG::Faction.new(name: 'The Emerald Enclave') }
+    let(:faction_1) { instance_double(RPG::Faction) }
+    let(:faction_2) { instance_double(RPG::Faction) }
 
-    it 'joins a faction' do
-      subject.join(faction_1)
+    it 'asks the game engine to join factions' do
+      expect(game).to receive(:join_faction).with(member: subject, factions: [faction_1, faction_2])
 
-      expect(subject.factions).to contain_exactly(faction_1)
-    end
-
-    it 'can join multiple factions' do
       subject.join(faction_1, faction_2)
-
-      expect(subject.factions).to contain_exactly(faction_1, faction_2)
-    end
-
-    context 'with existing faction' do
-      before do
-        subject.join(faction_1)
-      end
-
-      it 'can join additional factions' do
-        subject.join(faction_2, faction_3)
-
-        expect(subject.factions).to contain_exactly(faction_1, faction_2, faction_3)
-      end
-    end
-
-    it 'adds member to the faction' do
-      subject.join(faction_1)
-
-      expect(faction_1.members).to contain_exactly(subject)
     end
   end
 
   describe '#leave' do
-    let(:faction_1) { RPG::Faction.new(name: 'The Harpers') }
-    let(:faction_2) { RPG::Faction.new(name: 'The Order of the Gauntlet') }
-    let(:faction_3) { RPG::Faction.new(name: 'The Emerald Enclave') }
+    let(:faction_1) { instance_double(RPG::Faction) }
+    let(:faction_2) { instance_double(RPG::Faction) }
 
-    before do
-      subject.join(faction_1, faction_2)
-    end
+    it 'asks the game engine to leave factions' do
+      expect(game).to receive(:leave_faction).with(member: subject, factions: [faction_1, faction_2])
 
-    it 'leaves a faction' do
-      subject.leave(faction_1)
-
-      expect(subject.factions).to contain_exactly(faction_2)
-    end
-
-    it 'can leave multiple factions' do
       subject.leave(faction_1, faction_2)
-
-      expect(subject.factions).to be_empty
-    end
-
-    it 'does not do anything if it is not a member' do
-      subject.leave(faction_3)
-
-      expect(subject.factions).to contain_exactly(faction_1, faction_2)
     end
   end
 end
@@ -271,23 +212,11 @@ RSpec.describe RPG::MagicalObject do
 end
 
 RSpec.describe RPG::Faction do
-  let(:game) { RPG::Game.new }
+  let(:name) { 'The Order of Phoenix' }
 
-  subject { RPG::Faction.new(name: 'The Order of Phoenix') }
+  subject { RPG::Faction.new(name: name) }
 
-  describe 'initial faction' do
-    it 'has no members' do
-      expect(subject.members).to be_empty
-    end
-  end
-
-  describe '#add_member' do
-    let(:member) { RPG::Character.new(game: game) }
-
-    it 'adds member to faction' do
-      subject.add_member(member)
-
-      expect(subject.members).to contain_exactly(member)
-    end
+  it 'has a name' do
+    expect(subject.name).to eq(name)
   end
 end

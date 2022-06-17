@@ -6,12 +6,11 @@ module RPG
     MAX_HEALTH_LOW = 1000
     MAX_HEALTH_HIGH = 1500
 
-    attr_reader :health, :level, :factions
+    attr_reader :health, :level
 
     def initialize(level: 1, game:)
       @health = 1000
       @level = level
-      @factions = []
       @game = game
     end
 
@@ -20,20 +19,14 @@ module RPG
     end
 
     def join(*factions)
-      factions.each do |faction|
-        @factions.append(faction)
-        faction.add_member(self)
-      end
+      game.join_faction(member: self, factions: factions)
     end
 
     def leave(*factions)
-      @factions -= factions
+      game.leave_faction(member: self, factions: factions)
     end
 
     def deal_damage(target, amount)
-      raise InvalidActionError, 'a character cannot deal damage to itself' if target == self
-      raise InvalidActionError, 'a character cannot deal damage to an ally' if allied_with?(target)
-
       game.deal_damage(from: self, to: target, amount: amount)
     end
 
@@ -64,10 +57,6 @@ module RPG
     def high_level?
       level >= HIGH_LEVEL
     end
-
-    def allied_with?(target)
-      (target.factions & self.factions).any?
-    end
   end
 
   class MagicalObject
@@ -87,15 +76,10 @@ module RPG
   end
 
   class Faction
-    attr_reader :name, :members
+    attr_reader :name
 
     def initialize(name:)
       @name = name
-      @members = []
-    end
-
-    def add_member(member)
-      @members.append(member)
     end
   end
 end
