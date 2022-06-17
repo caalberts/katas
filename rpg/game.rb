@@ -27,5 +27,25 @@ module RPG
         @items << item
       end
     end
+
+    def deal_damage(from:, to:, amount:)
+      return if from == to
+
+      modifier = damage_modifier_for(source: from, target: to)
+
+      to.take_damage(amount * modifier)
+    end
+
+    private
+
+    def damage_modifier_for(source:, target:)
+      level_difference = target.level - source.level
+
+      case
+      when level_difference >= 5 then 0.5
+      when level_difference <= -5 then 1.5
+      else 1
+      end
+    end
   end
 end

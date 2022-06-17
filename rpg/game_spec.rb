@@ -51,6 +51,54 @@ RSpec.describe RPG::Game do
   end
 
   describe '#deal_damage' do
+    let(:source) { instance_double(RPG::Character) }
+    let(:target) { instance_double(RPG::Character) }
+    let(:amount) { 100 }
 
+    subject(:deal_damage) { game.deal_damage(from: source, to: target, amount: amount) }
+
+    context 'when the characters are similar level' do
+      let(:source) { instance_double(RPG::Character, level: 10) }
+      let(:target) { instance_double(RPG::Character, level: 9) }
+
+      it 'asks the target to take the damage amount' do
+        expect(target).to receive(:take_damage).with(amount)
+
+        deal_damage
+      end
+    end
+
+    context 'when the target is 5 levels or below the source' do
+      let(:source) { instance_double(RPG::Character, level: 10) }
+      let(:target) { instance_double(RPG::Character, level: 5) }
+
+      it 'asks the target to take 50% more damage' do
+        expect(target).to receive(:take_damage).with(1.5 * amount)
+
+        deal_damage
+      end
+    end
+
+    context 'when the target is 5 levels or above the source' do
+      let(:source) { instance_double(RPG::Character, level: 5) }
+      let(:target) { instance_double(RPG::Character, level: 10) }
+
+      it 'asks the target to take 50% less damage' do
+        expect(target).to receive(:take_damage).with(0.5 * amount)
+
+        deal_damage
+      end
+    end
+
+    context 'when the source and target are the same' do
+      let(:source) { instance_double(RPG::Character, level: 5) }
+      let(:target) { source }
+
+      it 'does not ask the target to take damage' do
+        expect(target).not_to receive(:take_damage)
+
+        deal_damage
+      end
+    end
   end
 end

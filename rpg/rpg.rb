@@ -30,23 +30,11 @@ module RPG
       @factions -= factions
     end
 
-    def damage_modifier_for(target)
-      level_difference = target.level - self.level
-
-      case
-      when level_difference >= 5 then 0.5
-      when level_difference <= -5 then 1.5
-      else 1
-      end
-    end
-
     def deal_damage(target, amount)
       raise InvalidActionError, 'a character cannot deal damage to itself' if target == self
       raise InvalidActionError, 'a character cannot deal damage to an ally' if allied_with?(target)
 
-      modifier = damage_modifier_for(target)
-
-      target.take_damage(modifier * amount)
+      game.deal_damage(from: self, to: target, amount: amount)
     end
 
     def heal(target, amount)

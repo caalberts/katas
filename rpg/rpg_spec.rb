@@ -24,38 +24,13 @@ RSpec.describe RPG::Character do
   end
 
   describe '#deal_damage' do
+    let(:amount) { 100 }
     let(:target) { described_class.new(game: game) }
 
-    it 'deals damage to the target' do
-      subject.deal_damage(target, 100)
+    it 'asks game engine to deal damage to target' do
+      expect(game).to receive(:deal_damage).with(from: subject, to: target, amount: amount)
 
-      expect(target.health).to eq(900)
-    end
-
-    it 'cannot deal damage to itself' do
-      expect { subject.deal_damage(subject, 1) }.to raise_error(RPG::InvalidActionError, 'a character cannot deal damage to itself')
-    end
-
-    context 'when target is 5 or more levels above the attacker' do
-      let(:target) { described_class.new(level: subject.level + 5, game: game) }
-
-      it 'deals 50% less damage' do
-        subject.deal_damage(target, 100)
-
-        expect(target.health).to eq(950)
-      end
-    end
-
-    context 'when target is 5 or more levels below the attacker' do
-      subject { described_class.new(level: 10, game: game) }
-
-      let(:target) { described_class.new(level: subject.level - 5, game: game) }
-
-      it 'deals 50% more damage' do
-        subject.deal_damage(target, 100)
-
-        expect(target.health).to eq(850)
-      end
+      subject.deal_damage(target, amount)
     end
 
     context 'when target is an ally' do
