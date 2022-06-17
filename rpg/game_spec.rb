@@ -119,6 +119,94 @@ RSpec.describe RPG::Game do
     end
   end
 
+  describe '#heal' do
+    let(:amount) { 100 }
+
+    subject(:heal) { game.heal(from: source, to: target, amount: amount) }
+
+    context 'when the source and target are the same' do
+      let(:source) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
+      let(:target) { source }
+
+      it 'asks the target to increase health by the amount' do
+        expect(target).to receive(:increase_health).with(amount)
+
+        heal
+      end
+
+      context 'when the target is dead' do
+        let(:source) { instance_double(RPG::Character, alive?: false, level: 5) }
+        let(:target) { source }
+
+        it 'does not ask the target to increase health' do
+          expect(target).not_to receive(:increase_health)
+
+          heal
+        end
+      end
+
+      context 'when character level is below 6' do
+        let(:source) { instance_double(RPG::Character, alive?: true, level: 5, health: 500) }
+        let(:amount) { 1500 }
+
+        it 'has heals to maximum health of 1000' do
+          expect(target).to receive(:increase_health).with(500)
+
+          heal
+        end
+      end
+
+      context 'when character level is 6 or above' do
+        let(:source) { instance_double(RPG::Character, alive?: true, level: 6, health: 500) }
+        let(:amount) { 2000 }
+
+        it 'has heals to maximum health of 1500' do
+          expect(target).to receive(:increase_health).with(1000)
+
+          heal
+        end
+      end
+    end
+
+    context 'when the characters are allied' do
+      let(:source) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
+      let(:target) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
+      let(:faction) { instance_double(RPG::Faction) }
+
+      before do
+        game.join_faction(member: source, factions: [faction])
+        game.join_faction(member: target, factions: [faction])
+      end
+
+      it 'asks the target to increase health by the amount' do
+        expect(target).to receive(:increase_health).with(amount)
+
+        heal
+      end
+
+      context 'when the target is dead' do
+        let(:target) { instance_double(RPG::Character, alive?: false) }
+
+        it 'does not ask the target to increase health' do
+          expect(target).not_to receive(:increase_health)
+
+          heal
+        end
+      end
+    end
+
+    context 'when the characters are not allied' do
+      let(:source) { instance_double(RPG::Character, alive?: true) }
+      let(:target) { instance_double(RPG::Character, alive?: true) }
+
+      it 'does not ask the target to increase health' do
+        expect(target).not_to receive(:increase_health)
+
+        heal
+      end
+    end
+  end
+
   describe '#join_faction' do
     let(:member) { instance_double(RPG::Character) }
     let(:faction1) { instance_double(RPG::Faction) }

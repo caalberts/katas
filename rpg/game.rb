@@ -37,6 +37,33 @@ module RPG
       to.take_damage(amount * modifier)
     end
 
+    def actual_heal_amount_for(target:, amount:)
+      max_health = max_health_for(target)
+
+      max_heal_amount = max_health - target.health
+
+      return max_heal_amount if amount >= max_heal_amount
+
+      amount
+    end
+
+    HIGH_LEVEL = 6
+    MAX_HEALTH_LOW = 1000
+    MAX_HEALTH_HIGH = 1500
+
+    def max_health_for(character)
+      character.level >= 6 ? MAX_HEALTH_HIGH : MAX_HEALTH_LOW
+    end
+
+    def heal(from:, to:, amount:)
+      return unless to.alive?
+      return unless allied?(from, to) || from == to
+
+      heal_amount = actual_heal_amount_for(target: to, amount: amount)
+
+      to.increase_health(heal_amount)
+    end
+
     def join_faction(member:, factions:)
       factions.each do |faction|
         self.factions[faction] ||= []

@@ -31,15 +31,11 @@ module RPG
     end
 
     def heal(target, amount)
-      raise InvalidActionError, 'a dead character cannot be healed' unless alive?
-      raise InvalidActionError, 'a non-ally cannot be healed' unless allied_with?(target) || target == self
-
-      target.increase_health(amount)
+      game.heal(from: self, to: target, amount: amount)
     end
 
     def increase_health(amount)
       @health += amount
-      @health = max_health if @health > max_health
     end
 
     def take_damage(amount)
@@ -49,10 +45,6 @@ module RPG
     private
 
     attr_reader :game
-
-    def max_health
-      high_level? ? MAX_HEALTH_HIGH : MAX_HEALTH_LOW
-    end
 
     def high_level?
       level >= HIGH_LEVEL

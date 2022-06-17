@@ -30,52 +30,15 @@ RSpec.describe RPG::Character do
     end
   end
 
-  xdescribe '#heal' do
+  describe '#heal' do
     context 'when healing itself' do
       let(:target) { subject }
       let(:amount) { 100 }
 
-      it 'increases target health by the given amount' do
-        expect(subject).to receive(:increase_health).with(amount)
+      it 'asks the game engine to heal target by the amount' do
+        expect(game).to receive(:heal).with(from: subject, to: target, amount: amount)
 
         subject.heal(target, amount)
-      end
-
-      context 'when character is dead' do
-        before do
-          target.take_damage(1001)
-        end
-
-        it 'cannot heal a dead target' do
-          expect { subject.heal(target, 1) }.to raise_error(RPG::InvalidActionError, 'a dead character cannot be healed')
-        end
-      end
-    end
-
-    context 'when a target is an ally' do
-      let(:alliance) { RPG::Faction.new(name: 'Allies') }
-
-      before do
-        subject.join(alliance)
-        target.join(alliance)
-      end
-
-      let(:target) { described_class.new(game: game) }
-      let(:amount) { 100 }
-
-      it 'increases target health by the given amount' do
-        expect(target).to receive(:increase_health).with(amount)
-
-        subject.heal(target, amount)
-      end
-    end
-
-    context 'when a target is not an ally' do
-      let(:target) { described_class.new(game: game) }
-      let(:amount) { 100 }
-
-      it 'cannot heal a non-ally' do
-        expect { subject.heal(target, amount) }.to raise_error(RPG::InvalidActionError, 'a non-ally cannot be healed')
       end
     end
   end
@@ -89,26 +52,6 @@ RSpec.describe RPG::Character do
       subject.increase_health(50)
 
       expect(subject.health).to eq(950)
-    end
-
-    context 'when character level is below 6' do
-      subject { described_class.new(level: 5, game: game) }
-
-      it 'has maximum health of 1000' do
-        subject.increase_health(2000)
-
-        expect(subject.health).to eq(1000)
-      end
-    end
-
-    context 'when character level is 6' do
-      subject { described_class.new(level: 6, game: game) }
-
-      it 'has maximum health of 1500' do
-        subject.increase_health(2000)
-
-        expect(subject.health).to eq(1500)
-      end
     end
   end
 
