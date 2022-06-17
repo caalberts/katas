@@ -10,8 +10,8 @@ module RPG
       @items = []
     end
 
-    def create_character
-      RPG::Character.new.tap do |character|
+    def create_character(level: 1)
+      RPG::Character.new(level: level).tap do |character|
         @characters << character
       end
     end

@@ -6,12 +6,23 @@ RSpec.describe RPG::Game do
   describe '#create_character' do
     subject(:character) { game.create_character }
 
-    it 'returns a character' do
+    it 'returns a level 1 character' do
       expect(character).to be_a(RPG::Character)
+      expect(character.level).to eq(1)
     end
 
     it 'adds character to the game' do
       expect(game.characters).to contain_exactly(character)
+    end
+
+    describe 'with a level' do
+      let(:level) { 100 }
+
+      it 'creates character at the given level' do
+        character = game.create_character(level: level)
+
+        expect(character.level).to eq(level)
+      end
     end
   end
 
