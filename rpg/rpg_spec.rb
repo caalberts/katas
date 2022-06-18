@@ -31,12 +31,15 @@ RSpec.describe RPG::Character do
   end
 
   describe '#heal' do
-    context 'when healing itself' do
-      let(:target) { subject }
-      let(:amount) { 100 }
+    let(:target) { described_class.new(game: game) }
+    let(:amount) { 100 }
+    let(:heal_amount) { 75 }
 
-      it 'asks the game engine to heal target by the amount' do
-        expect(game).to receive(:heal).with(from: subject, to: target, amount: amount)
+    context 'when target can be healed' do
+      it 'increases target health' do
+        expect(game).to receive(:can_heal?).with(from: subject, to: target).and_return(true)
+        expect(game).to receive(:actual_heal_amount_for).with(target: target, amount: amount).and_return(heal_amount)
+        expect(target).to receive(:increase_health).with(heal_amount)
 
         subject.heal(target, amount)
       end

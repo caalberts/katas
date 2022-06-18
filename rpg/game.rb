@@ -51,17 +51,10 @@ module RPG
     MAX_HEALTH_LOW = 1000
     MAX_HEALTH_HIGH = 1500
 
-    def max_health_for(character)
-      character.level >= 6 ? MAX_HEALTH_HIGH : MAX_HEALTH_LOW
-    end
+    def can_heal?(from:, to:)
+      return false unless to.alive?
 
-    def heal(from:, to:, amount:)
-      return unless to.alive?
-      return unless allied?(from, to) || from == to
-
-      heal_amount = actual_heal_amount_for(target: to, amount: amount)
-
-      to.increase_health(heal_amount)
+      from == to || allied?(from, to)
     end
 
     def join_faction(member:, factions:)
@@ -92,6 +85,10 @@ module RPG
       when level_difference <= -5 then 1.5
       else 1
       end
+    end
+
+    def max_health_for(character)
+      character.level >= 6 ? MAX_HEALTH_HIGH : MAX_HEALTH_LOW
     end
 
     def allied?(member1, member2)

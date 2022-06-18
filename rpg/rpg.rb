@@ -31,7 +31,11 @@ module RPG
     end
 
     def heal(target, amount)
-      game.heal(from: self, to: target, amount: amount)
+      return unless game.can_heal?(from: self, to: target)
+
+      heal_amount = game.actual_heal_amount_for(target: target, amount: amount)
+
+      target.increase_health(heal_amount)
     end
 
     def increase_health(amount)

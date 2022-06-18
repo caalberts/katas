@@ -119,56 +119,24 @@ RSpec.describe RPG::Game do
     end
   end
 
-  describe '#heal' do
-    let(:amount) { 100 }
-
-    subject(:heal) { game.heal(from: source, to: target, amount: amount) }
+  describe '#can_heal?' do
+    subject(:can_heal?) { game.can_heal?(from: source, to: target) }
 
     context 'when the source and target are the same' do
       let(:source) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
       let(:target) { source }
 
-      it 'asks the target to increase health by the amount' do
-        expect(target).to receive(:increase_health).with(amount)
-
-        heal
-      end
-
-      context 'when the target is dead' do
-        let(:source) { instance_double(RPG::Character, alive?: false, level: 5) }
-        let(:target) { source }
-
-        it 'does not ask the target to increase health' do
-          expect(target).not_to receive(:increase_health)
-
-          heal
-        end
-      end
-
-      context 'when character level is below 6' do
-        let(:source) { instance_double(RPG::Character, alive?: true, level: 5, health: 500) }
-        let(:amount) { 1500 }
-
-        it 'has heals to maximum health of 1000' do
-          expect(target).to receive(:increase_health).with(500)
-
-          heal
-        end
-      end
-
-      context 'when character level is 6 or above' do
-        let(:source) { instance_double(RPG::Character, alive?: true, level: 6, health: 500) }
-        let(:amount) { 2000 }
-
-        it 'has heals to maximum health of 1500' do
-          expect(target).to receive(:increase_health).with(1000)
-
-          heal
-        end
-      end
+      it { is_expected.to be_truthy }
     end
 
-    context 'when the characters are allied' do
+    context 'when the target is dead' do
+      let(:source) { instance_double(RPG::Character, alive?: false) }
+      let(:target) { source }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when the source and target are allied' do
       let(:source) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
       let(:target) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
       let(:faction) { instance_double(RPG::Faction) }
@@ -178,31 +146,57 @@ RSpec.describe RPG::Game do
         game.join_faction(member: target, factions: [faction])
       end
 
-      it 'asks the target to increase health by the amount' do
-        expect(target).to receive(:increase_health).with(amount)
+      it { is_expected.to be_truthy }
+    end
 
-        heal
+    context 'when the source and target are not allied' do
+      let(:source) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
+      let(:target) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#actual_heal_amount_for' do
+    subject { game.actual_heal_amount_for(target: target, amount: amount) }
+
+    context 'when character level is below 6' do
+      let(:target) { instance_double(RPG::Character, level: 5, health: 500) }
+
+      context 'when the amount is more than the maximum health' do
+        let(:amount) { 1000 }
+
+        it 'returns the amount needed to maximum health 1000' do
+          expect(subject).to eq(500)
+        end
       end
 
-      context 'when the target is dead' do
-        let(:target) { instance_double(RPG::Character, alive?: false) }
+      context 'when the amount is less than or equal the maximum health' do
+        let(:amount) { 100 }
 
-        it 'does not ask the target to increase health' do
-          expect(target).not_to receive(:increase_health)
-
-          heal
+        it 'returns the given amount' do
+          expect(subject).to eq(amount)
         end
       end
     end
 
-    context 'when the characters are not allied' do
-      let(:source) { instance_double(RPG::Character, alive?: true) }
-      let(:target) { instance_double(RPG::Character, alive?: true) }
+    context 'when character level is 6 or above' do
+      let(:target) { instance_double(RPG::Character, level: 6, health: 800) }
 
-      it 'does not ask the target to increase health' do
-        expect(target).not_to receive(:increase_health)
+      context 'when the amount is more than the maximum health' do
+        let(:amount) { 1000 }
 
-        heal
+        it 'returns the amount needed to maximum health 1500' do
+          expect(subject).to eq(700)
+        end
+      end
+
+      context 'when the amount is less than or equal the maximum health' do
+        let(:amount) { 100 }
+
+        it 'returns the given amount' do
+          expect(subject).to eq(amount)
+        end
       end
     end
   end
