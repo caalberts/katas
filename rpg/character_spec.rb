@@ -22,11 +22,16 @@ RSpec.describe RPG::Character do
   describe '#deal_damage' do
     let(:amount) { 100 }
     let(:target) { described_class.new(game: game) }
+    let(:damage_amount) { 50 }
 
-    it 'asks game engine to deal damage to target' do
-      expect(game).to receive(:deal_damage).with(from: subject, to: target, amount: amount)
+    context 'when target can be damaged' do
+      it 'reduces target health by amount after modifier' do
+        expect(game).to receive(:can_damage?).with(from: subject, to: target).and_return(true)
+        expect(game).to receive(:actual_damage_amount_for).with(source: subject, target: target, amount: amount).and_return(damage_amount)
+        expect(target).to receive(:take_damage).with(damage_amount)
 
-      subject.deal_damage(target, amount)
+        subject.deal_damage(target, amount)
+      end
     end
 
     context 'when damage is not provided' do
@@ -38,7 +43,9 @@ RSpec.describe RPG::Character do
         end
 
         it 'deals weapon damage' do
-          expect(game).to receive(:deal_damage).with(from: subject, to: target, amount: weapon.damage)
+          expect(game).to receive(:can_damage?).with(from: subject, to: target).and_return(true)
+          expect(game).to receive(:actual_damage_amount_for).with(source: subject, target: target, amount: weapon.damage).and_return(damage_amount)
+          expect(target).to receive(:take_damage).with(damage_amount)
 
           subject.deal_damage(target)
         end
@@ -46,7 +53,9 @@ RSpec.describe RPG::Character do
 
       context 'and there is no weapon' do
         it 'deals 0 damage' do
-          expect(game).to receive(:deal_damage).with(from: subject, to: target, amount: 0)
+          expect(game).to receive(:can_damage?).with(from: subject, to: target).and_return(true)
+          expect(game).to receive(:actual_damage_amount_for).with(source: subject, target: target, amount: 0).and_return(0)
+          expect(target).to receive(:take_damage).with(0)
 
           subject.deal_damage(target)
         end

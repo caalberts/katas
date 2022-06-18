@@ -34,13 +34,14 @@ module RPG
       end
     end
 
-    def deal_damage(from:, to:, amount:)
-      return if from == to
-      return if allied?(from, to)
+    def can_damage?(from:, to:)
+      return false if from == to || allied?(from, to)
 
-      modifier = damage_modifier_for(source: from, target: to)
+      true
+    end
 
-      to.take_damage(amount * modifier)
+    def actual_damage_amount_for(source:, target:, amount:)
+      damage_modifier_for(source: source, target: target) * amount
     end
 
     def actual_heal_amount_for(target:, amount:)
@@ -84,6 +85,8 @@ module RPG
     private
 
     def damage_modifier_for(source:, target:)
+      return 1 unless target.respond_to?(:level)
+
       level_difference = target.level - source.level
 
       case

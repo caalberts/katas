@@ -73,6 +73,10 @@ RSpec.describe 'RPG Integration Specs' do
 
         expect(obi_wan.health).to eq(1500)
         expect(chewy.health).to eq(1000)
+
+        obi_wan.deal_damage(blaster)
+
+        expect(blaster).to be_destroyed
       end
     end
   end

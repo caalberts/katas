@@ -50,60 +50,20 @@ RSpec.describe RPG::Game do
     end
   end
 
-  describe '#deal_damage' do
+  describe '#can_damage?' do
+    subject(:can_damage?) { game.can_damage?(from: source, to: target) }
+
     let(:source) { instance_double(RPG::Character) }
-    let(:target) { instance_double(RPG::Character) }
-    let(:amount) { 100 }
-
-    subject(:deal_damage) { game.deal_damage(from: source, to: target, amount: amount) }
-
-    context 'when the characters are similar level' do
-      let(:source) { instance_double(RPG::Character, level: 10) }
-      let(:target) { instance_double(RPG::Character, level: 9) }
-
-      it 'asks the target to take the damage amount' do
-        expect(target).to receive(:take_damage).with(amount)
-
-        deal_damage
-      end
-    end
-
-    context 'when the target is 5 levels or below the source' do
-      let(:source) { instance_double(RPG::Character, level: 10) }
-      let(:target) { instance_double(RPG::Character, level: 5) }
-
-      it 'asks the target to take 50% more damage' do
-        expect(target).to receive(:take_damage).with(1.5 * amount)
-
-        deal_damage
-      end
-    end
-
-    context 'when the target is 5 levels or above the source' do
-      let(:source) { instance_double(RPG::Character, level: 5) }
-      let(:target) { instance_double(RPG::Character, level: 10) }
-
-      it 'asks the target to take 50% less damage' do
-        expect(target).to receive(:take_damage).with(0.5 * amount)
-
-        deal_damage
-      end
-    end
 
     context 'when the source and target are the same' do
-      let(:source) { instance_double(RPG::Character, level: 5) }
       let(:target) { source }
 
-      it 'does not ask the target to take damage' do
-        expect(target).not_to receive(:take_damage)
-
-        deal_damage
-      end
+      it { is_expected.to be_falsey }
     end
 
-    context 'when the characters are allied' do
-      let(:source) { instance_double(RPG::Character) }
-      let(:target) { instance_double(RPG::Character) }
+    context 'when the source and target are allied' do
+      let(:source) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
+      let(:target) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
       let(:faction) { instance_double(RPG::Faction) }
 
       before do
@@ -111,11 +71,46 @@ RSpec.describe RPG::Game do
         game.join_faction(member: target, factions: [faction])
       end
 
-      it 'does not ask the target to take damage' do
-        expect(target).not_to receive(:take_damage)
+      it { is_expected.to be_falsey }
+    end
 
-        deal_damage
-      end
+    context 'when the source and target are not allied' do
+      let(:source) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
+      let(:target) { instance_double(RPG::Character, alive?: true, level: 5, health: 100) }
+
+      it { is_expected.to be_truthy }
+    end
+  end
+
+  describe '#actual_damage_amount_for' do
+    let(:amount) { 100 }
+    let(:source) { instance_double(RPG::Character, level: 10) }
+    let(:target) { instance_double(RPG::Character, level: 9) }
+
+    subject { game.actual_damage_amount_for(source: source, target: target, amount: amount) }
+
+    context 'when source and target are of similar level' do
+      it { is_expected.to eq(amount) }
+    end
+
+    context 'when the target is 5 levels or below the source' do
+      let(:source) { instance_double(RPG::Character, level: 10) }
+      let(:target) { instance_double(RPG::Character, level: 5) }
+
+      it { is_expected.to eq(1.5 * amount) }
+    end
+
+    context 'when the target is 5 levels or above the source' do
+      let(:source) { instance_double(RPG::Character, level: 5) }
+      let(:target) { instance_double(RPG::Character, level: 10) }
+
+      it { is_expected.to eq(0.5 * amount) }
+    end
+
+    context 'when the target does not have a level' do
+      let(:target) { instance_double(RPG::MagicalObject) }
+
+      it { is_expected.to eq(amount) }
     end
   end
 

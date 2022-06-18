@@ -26,8 +26,10 @@ module RPG
     end
 
     def deal_damage(target, amount = nil)
-      damage_to_deal = amount || damage_from_weapon
-      game.deal_damage(from: self, to: target, amount: damage_to_deal)
+      return unless game.can_damage?(from: self, to: target)
+      actual_damage = game.actual_damage_amount_for(source: self, target: target, amount: amount || damage_from_weapon)
+
+      target.take_damage(actual_damage)
     end
 
     def heal(target, amount)
