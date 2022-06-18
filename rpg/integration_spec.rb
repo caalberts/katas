@@ -28,6 +28,11 @@ RSpec.describe 'RPG Integration Specs' do
 
         expect(obi_wan.health).to eq(900)
         expect(anakin).not_to be_alive
+
+        obi_wan.use(bactasuit)
+
+        expect(obi_wan.health).to eq(1500)
+        expect(bactasuit.health).to eq(200)
       end
 
       it 'tells of a helpless fight between the weak and the villain' do

@@ -23,7 +23,7 @@ module RPG
     end
 
     def create_item(health:)
-      RPG::MagicalObject.new(health: health).tap do |item|
+      RPG::MagicalObject.new(health: health, game: self).tap do |item|
         @items << item
       end
     end
@@ -76,6 +76,10 @@ module RPG
         self.factions[faction] ||= []
         self.factions[faction].delete_if { |m| m == member }
       end
+    end
+
+    def use(character:, object:)
+      object.apply_effect_to(target: character)
     end
 
     private
