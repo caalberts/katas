@@ -1,14 +1,19 @@
 require_relative './rpg'
 
-RSpec.describe RPG::MagicalObject do
+RSpec.describe RPG::MagicalWeapon do
   let(:health) { 100 }
+  let(:damage) { 10 }
   let(:game) { instance_double(RPG::Game) }
 
-  subject { described_class.new(health: health, game: game) }
+  subject { described_class.new(health: health, damage: damage, game: game) }
 
-  describe 'initial magical object' do
+  describe 'initial magical weapon' do
     it 'starts with some health' do
       expect(subject.health).to eq(health)
+    end
+
+    it 'starts with some damage' do
+      expect(subject.damage).to eq(damage)
     end
   end
 
@@ -22,14 +27,13 @@ RSpec.describe RPG::MagicalObject do
 
   describe '#apply_effect_to' do
     let(:target) { instance_double(RPG::Character) }
-    let(:heal_amount) { 50 }
 
-    it 'asks game engine for actual heal amount increases target health' do
-      expect(game).to receive(:actual_heal_amount_for).with(target: target, amount: health)
-        .and_return(heal_amount)
-      expect(target).to receive(:increase_health).with(heal_amount)
+    it 'sets character weapon to itself and reduces weapon health by 1' do
+      expect(target).to receive(:weapon=).with(subject)
 
       subject.apply_effect_to(target: target)
+
+      expect(subject.health).to eq(health - 1)
     end
   end
 

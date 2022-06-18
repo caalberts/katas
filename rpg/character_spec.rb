@@ -28,6 +28,30 @@ RSpec.describe RPG::Character do
 
       subject.deal_damage(target, amount)
     end
+
+    context 'when damage is not provided' do
+      context 'and there is a weapon' do
+        let(:weapon) { instance_double(RPG::MagicalWeapon, damage: 10) }
+
+        before do
+          allow(subject).to receive(:weapon).and_return(weapon)
+        end
+
+        it 'deals weapon damage' do
+          expect(game).to receive(:deal_damage).with(from: subject, to: target, amount: weapon.damage)
+
+          subject.deal_damage(target)
+        end
+      end
+
+      context 'and there is no weapon' do
+        it 'deals 0 damage' do
+          expect(game).to receive(:deal_damage).with(from: subject, to: target, amount: 0)
+
+          subject.deal_damage(target)
+        end
+      end
+    end
   end
 
   describe '#heal' do

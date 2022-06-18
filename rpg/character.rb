@@ -5,6 +5,7 @@ module RPG
     MAX_HEALTH_HIGH = 1500
 
     attr_reader :health, :level
+    attr_writer :weapon
 
     def initialize(level: 1, game:)
       @health = 1000
@@ -24,8 +25,9 @@ module RPG
       game.leave_faction(member: self, factions: factions)
     end
 
-    def deal_damage(target, amount)
-      game.deal_damage(from: self, to: target, amount: amount)
+    def deal_damage(target, amount = nil)
+      damage_to_deal = amount || damage_from_weapon
+      game.deal_damage(from: self, to: target, amount: damage_to_deal)
     end
 
     def heal(target, amount)
@@ -50,10 +52,14 @@ module RPG
 
     private
 
-    attr_reader :game
+    attr_reader :game, :weapon
 
     def high_level?
       level >= HIGH_LEVEL
+    end
+
+    def damage_from_weapon
+      weapon&.damage || 0
     end
   end
 end

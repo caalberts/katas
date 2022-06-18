@@ -1,9 +1,10 @@
 module RPG
-  class MagicalObject
-    attr_reader :health
+  class MagicalWeapon
+    attr_reader :health, :damage
 
-    def initialize(health:, game:)
+    def initialize(health:, damage:, game:)
       @health = health
+      @damage = damage
       @game = game
     end
 
@@ -16,9 +17,8 @@ module RPG
     end
 
     def apply_effect_to(target:)
-      heal_amount = game.actual_heal_amount_for(target: target, amount: health)
-
-      target.increase_health(heal_amount)
+      target.weapon = self
+      self.take_damage(1)
     end
 
     private

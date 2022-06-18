@@ -28,6 +28,12 @@ module RPG
       end
     end
 
+    def create_weapon(health:, damage:)
+      RPG::MagicalWeapon.new(health: health, damage: damage, game: self).tap do |item|
+        @items << item
+      end
+    end
+
     def deal_damage(from:, to:, amount:)
       return if from == to
       return if allied?(from, to)

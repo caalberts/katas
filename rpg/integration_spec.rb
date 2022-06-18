@@ -3,19 +3,30 @@ require_relative './game'
 RSpec.describe 'RPG Integration Specs' do
   let!(:game) { RPG::Game.new }
   let!(:jedis) { game.create_faction(name: 'Jedis') }
+  let!(:rebels) { game.create_faction(name: 'Rebels') }
   let!(:siths) { game.create_faction(name: 'Siths') }
-  let!(:obi_wan) { game.create_character(level: 60) }
-  let!(:anakin) { game.create_character(level: 59) }
-  let!(:youngling) { game.create_character(level: 10) }
+  let!(:empire) { game.create_faction(name: 'Empire') }
+  let!(:obi_wan) { game.create_character(level: 8) }
+  let!(:anakin) { game.create_character(level: 9) }
+  let!(:youngling) { game.create_character(level: 1) }
+  let!(:chewy) { game.create_character(level: 4) }
+  let!(:stormtrooper) { game.create_character(level: 3) }
   let!(:bactasuit) { game.create_item(health: 800) }
+  let!(:lightsaber) { game.create_weapon(health: 100, damage: 200) }
+  let!(:blaster) { game.create_weapon(health: 10, damage: 10) }
+  let!(:crossbow) { game.create_weapon(health: 20, damage: 100) }
 
   describe 'an RPG story' do
     context 'with alliances' do
       before do
         obi_wan.join(jedis)
         youngling.join(jedis)
+        obi_wan.join(rebels)
+        chewy.join(rebels)
 
         anakin.join(siths)
+        anakin.join(empire)
+        stormtrooper.join(empire)
       end
 
       it 'tells of enemies fighting and dying' do
@@ -32,7 +43,6 @@ RSpec.describe 'RPG Integration Specs' do
         obi_wan.use(bactasuit)
 
         expect(obi_wan.health).to eq(1500)
-        expect(bactasuit.health).to eq(200)
       end
 
       it 'tells of a helpless fight between the weak and the villain' do
@@ -44,6 +54,25 @@ RSpec.describe 'RPG Integration Specs' do
 
         expect(anakin.health).to eq(995)
         expect(youngling).not_to be_alive
+      end
+
+      it 'tells of fights using weapons and items' do
+        obi_wan.use(lightsaber)
+        obi_wan.deal_damage(stormtrooper) # obi_wan deals 1.5 damage
+        stormtrooper.use(blaster)
+        stormtrooper.deal_damage(chewy)
+        chewy.use(crossbow)
+        chewy.deal_damage(stormtrooper)
+
+        expect(obi_wan.health).to eq(1000)
+        expect(stormtrooper.health).to eq(600)
+        expect(chewy.health).to eq(990)
+
+        obi_wan.use(bactasuit)
+        chewy.use(bactasuit)
+
+        expect(obi_wan.health).to eq(1500)
+        expect(chewy.health).to eq(1000)
       end
     end
   end
