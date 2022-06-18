@@ -1,4 +1,4 @@
-require_relative './game'
+require_relative './rpg'
 
 RSpec.describe RPG::Game do
   let(:game) { described_class.new }
