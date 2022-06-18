@@ -78,10 +78,6 @@ module RPG
       end
     end
 
-    def use(character:, object:)
-      object.apply_effect_to(target: character)
-    end
-
     private
 
     def damage_modifier_for(source:, target:)

@@ -28,12 +28,10 @@ RSpec.describe RPG::MagicalWeapon do
   describe '#apply_effect_to' do
     let(:target) { instance_double(RPG::Character) }
 
-    it 'sets character weapon to itself and reduces weapon health by 1' do
+    it 'sets character weapon to itself' do
       expect(target).to receive(:weapon=).with(subject)
 
       subject.apply_effect_to(target: target)
-
-      expect(subject.health).to eq(health - 1)
     end
   end
 

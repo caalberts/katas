@@ -49,7 +49,7 @@ module RPG
     end
 
     def use(object)
-      game.use(character: self, object: object)
+      object.apply_effect_to(target: self)
     end
 
     private
@@ -61,7 +61,10 @@ module RPG
     end
 
     def damage_from_weapon
-      weapon&.damage || 0
+      return 0 unless weapon && !weapon.destroyed?
+
+      weapon.take_damage(1)
+      weapon&.damage
     end
   end
 end

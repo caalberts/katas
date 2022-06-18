@@ -36,16 +36,33 @@ RSpec.describe RPG::Character do
 
     context 'when damage is not provided' do
       context 'and there is a weapon' do
-        let(:weapon) { instance_double(RPG::MagicalWeapon, damage: 10) }
+        let(:weapon) { instance_double(RPG::MagicalWeapon, damage: 10, destroyed?: false) }
 
         before do
           allow(subject).to receive(:weapon).and_return(weapon)
         end
 
-        it 'deals weapon damage' do
+        it 'deals weapon damage and reduces weapon health by 1' do
           expect(game).to receive(:can_damage?).with(from: subject, to: target).and_return(true)
           expect(game).to receive(:actual_damage_amount_for).with(source: subject, target: target, amount: weapon.damage).and_return(damage_amount)
           expect(target).to receive(:take_damage).with(damage_amount)
+          expect(weapon).to receive(:take_damage).with(1)
+
+          subject.deal_damage(target)
+        end
+      end
+
+      context 'when weapon is destroyed' do
+        let(:weapon) { instance_double(RPG::MagicalWeapon, destroyed?: true) }
+
+        before do
+          allow(subject).to receive(:weapon).and_return(weapon)
+        end
+
+        it 'deals 0 damage' do
+          expect(game).to receive(:can_damage?).with(from: subject, to: target).and_return(true)
+          expect(game).to receive(:actual_damage_amount_for).with(source: subject, target: target, amount: 0).and_return(0)
+          expect(target).to receive(:take_damage).with(0)
 
           subject.deal_damage(target)
         end
@@ -148,8 +165,8 @@ RSpec.describe RPG::Character do
   describe '#use' do
     let(:object) { instance_double(RPG::MagicalObject) }
 
-    it 'asks the game engine to use item' do
-      expect(game).to receive(:use).with(character: subject, object: object)
+    it 'asks the item to apply its effect' do
+      expect(object).to receive(:apply_effect_to).with(target: subject)
 
       subject.use(object)
     end

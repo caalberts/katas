@@ -67,6 +67,9 @@ RSpec.describe 'RPG Integration Specs' do
         expect(obi_wan.health).to eq(1000)
         expect(stormtrooper.health).to eq(600)
         expect(chewy.health).to eq(990)
+        expect(lightsaber.health).to eq(99)
+        expect(blaster.health).to eq(9)
+        expect(crossbow.health).to eq(19)
 
         obi_wan.use(bactasuit)
         chewy.use(bactasuit)
@@ -76,7 +79,9 @@ RSpec.describe 'RPG Integration Specs' do
 
         obi_wan.deal_damage(blaster)
 
+        expect(lightsaber.health).to eq(98)
         expect(blaster).to be_destroyed
+        expect(crossbow.health).to eq(19)
       end
     end
   end

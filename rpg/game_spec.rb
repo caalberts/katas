@@ -229,17 +229,4 @@ RSpec.describe RPG::Game do
       expect(game.factions[faction2]).to be_empty
     end
   end
-
-  describe '#use' do
-    let(:character) { instance_double(RPG::Character) }
-    let(:object) { instance_double(RPG::MagicalObject) }
-
-    subject(:use_object) { game.use(character: character, object: object) }
-
-    it 'applies effect of object to target' do
-      expect(object).to receive(:apply_effect_to).with(target: character)
-
-      use_object
-    end
-  end
 end

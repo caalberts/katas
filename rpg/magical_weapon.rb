@@ -18,7 +18,6 @@ module RPG
 
     def apply_effect_to(target:)
       target.weapon = self
-      self.take_damage(1)
     end
 
     private
