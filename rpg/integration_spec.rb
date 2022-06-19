@@ -83,6 +83,17 @@ RSpec.describe 'RPG Integration Specs' do
         expect(blaster).to be_destroyed
         expect(crossbow.health).to eq(19)
       end
+
+      it 'tells of characters leveling up' do
+        stormtrooper.deal_damage(youngling, 999)
+
+        youngling.use(bactasuit)
+
+        stormtrooper.deal_damage(youngling, 1)
+
+        expect(youngling).to be_alive
+        expect(youngling.level).to eq(2)
+      end
     end
   end
 end

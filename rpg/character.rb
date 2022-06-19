@@ -4,6 +4,8 @@ module RPG
     MAX_HEALTH_LOW = 1000
     MAX_HEALTH_HIGH = 1500
 
+    DAMAGE_FOR_LEVEL_UP = 1000
+
     attr_reader :health, :level
     attr_writer :weapon
 
@@ -11,6 +13,8 @@ module RPG
       @health = 1000
       @level = level
       @game = game
+      @accumulated_damage = 0
+      @level_up_requirement = level * DAMAGE_FOR_LEVEL_UP
     end
 
     def alive?
@@ -46,6 +50,9 @@ module RPG
 
     def take_damage(amount)
       @health -= amount
+      @accumulated_damage += amount
+
+      level_up if accumulated_damage >= level_up_requirement
     end
 
     def use(object)
@@ -54,7 +61,17 @@ module RPG
 
     private
 
-    attr_reader :game, :weapon
+    attr_reader :game, :weapon, :accumulated_damage, :level_up_requirement
+
+    def increase_level_up_requirement
+      @level_up_requirement += level * DAMAGE_FOR_LEVEL_UP
+    end
+
+    def level_up
+      @level += 1
+
+      increase_level_up_requirement
+    end
 
     def high_level?
       level >= HIGH_LEVEL

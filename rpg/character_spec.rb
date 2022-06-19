@@ -121,6 +121,40 @@ RSpec.describe RPG::Character do
 
         expect(subject.alive?).to be(true)
       end
+
+      context 'when the accumulated damage is enough to level up' do
+        it 'levels up' do
+          subject.take_damage(999)
+          subject.increase_health(100)
+          subject.take_damage(1)
+
+          expect(subject).to be_alive
+          expect(subject.level).to eq(2)
+        end
+      end
+
+      context 'when the character level is higher' do
+        subject { described_class.new(level: 1, game: game) }
+
+        it 'requires more damage to level up' do
+          subject.take_damage(500)
+          subject.increase_health(10000)
+          subject.take_damage(1000)
+
+          expect(subject.level).to eq(2)
+
+          subject.take_damage(500)
+          expect(subject.level).to eq(2)
+
+          subject.take_damage(1000)
+          expect(subject.level).to eq(3)
+
+          subject.take_damage(3000)
+          expect(subject.level).to eq(4)
+
+          expect(subject).to be_alive
+        end
+      end
     end
 
     context 'remaining health is 0' do
@@ -128,6 +162,10 @@ RSpec.describe RPG::Character do
         subject.take_damage(1000)
 
         expect(subject.alive?).to be(false)
+      end
+
+      it 'does not level up' do
+        expect(subject.level).to eq(1)
       end
     end
 
